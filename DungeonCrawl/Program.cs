@@ -397,7 +397,7 @@ namespace DungeonCrawl
 					{
 						character.maxHitpoints = character.hitpoints;
 					}
-					messages.Add($"You drink a potion and gain {item.quality} hitpoints");
+					messages.Add($"You drink a potion and gain {item.quality} Hp");
 					character.inventory.Remove(item);
 					break;
 			}
@@ -760,7 +760,7 @@ namespace DungeonCrawl
 		static PlayerTurnResult DrawInventory(PlayerCharacter character, List<string> messages)
 		{
 			Console.SetCursorPosition(1, 1);
-			PrintLine("Inventory. Select item by inputting the number next to it. Invalid input closes inventory");
+			PrintLine("Inventory. Select item by inputting the number next to it. Close the Inventory by pressing 'Enter'");
 			ItemType currentType = ItemType.Weapon;
 			PrintLine("Weapons", ConsoleColor.DarkCyan);
 			for (int i = 0; i < character.inventory.Count; i++)
@@ -791,6 +791,10 @@ namespace DungeonCrawl
 						UseItem(character, character.inventory[selectionindex], messages);
 						break;
 					}
+				}
+				else if( choiceStr == "")
+				{
+					break;
 				}
 				else
 				{
