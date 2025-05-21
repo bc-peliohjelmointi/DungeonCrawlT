@@ -80,7 +80,7 @@ namespace DungeonCrawl
 						state = GameState.GameLoop;
 						break;
 					case GameState.GameLoop:
-						DrawMap(currentLevel, dirtyTiles);
+						Map.DrawMap(currentLevel, dirtyTiles);
 						dirtyTiles.Clear();
 						DrawEnemies(monsters);
 						DrawItems(items);
@@ -404,35 +404,6 @@ namespace DungeonCrawl
 			}
 		}
 
-		static Monster CreateMonster(string name, int hitpoints, char symbol, ConsoleColor color, Vector2 position)
-		{
-			
-			return new Monster(name, hitpoints, symbol, color, position);
-		}
-
-		static Monster CreateRandomMonster(Random random, Vector2 position)
-		{
-			int type = random.Next(4);
-			return type switch
-			{
-				0 => CreateMonster("Goblin", 5, 'g', ConsoleColor.Green, position),
-				1 => CreateMonster("Bat Man", 2, 'M', ConsoleColor.Magenta, position),
-				2 => CreateMonster("Orc", 15, 'o', ConsoleColor.Red, position),
-				3 => CreateMonster("Bunny", 1, 'B', ConsoleColor.Yellow, position)
-			};
-		}
-		static Item CreateRandomItem(Random random, Vector2 position)
-		{
-			ItemType type = Enum.GetValues<ItemType>()[random.Next(4)];
-			Item i = type switch
-			{
-				ItemType.Treasure => CreateItem("Book", type, 2, position),
-				ItemType.Weapon => CreateItem("Sword", type, 3, position),
-				ItemType.Armor => CreateItem("Helmet", type, 1, position),
-				ItemType.Potion => CreateItem("Apple Juice", type, 1, position)
-			};
-			return i;
-		}
 		static List<Monster> CreateEnemies(Map level, Random random)
 		{
 			List<Monster> monsters = new List<Monster>();
@@ -444,7 +415,7 @@ namespace DungeonCrawl
 					int ti = y * level.width + x;
 					if (level.Tiles[ti] == Map.Tile.Monster)
 					{
-						Monster m = CreateRandomMonster(random, new Vector2(x, y));
+						Monster m = Monster.CreateRandomMonster(random, new Vector2(x, y));
 						monsters.Add(m);
 						level.Tiles[ti] = (sbyte)Map.Tile.Floor;
 					}
@@ -453,11 +424,6 @@ namespace DungeonCrawl
 			return monsters;
 		}
 
-		static Item CreateItem(string name, ItemType type, int quality, Vector2 position)
-		{
-			
-			return new Item(name, type, quality, position);
-		}
 		static List<Item> CreateItems(Map level, Random random)
 		{
 			List<Item> items = new List<Item>();
@@ -469,7 +435,7 @@ namespace DungeonCrawl
 					int ti = y * level.width + x;
 					if (level.Tiles[ti] == Map.Tile.Item)
 					{
-						Item m = CreateRandomItem(random, new Vector2(x, y));
+						Item m = Item.CreateRandomItem(random, new Vector2(x, y));
 						items.Add(m);
 						level.Tiles[ti] = (sbyte)Map.Tile.Floor;
 					}
@@ -506,26 +472,7 @@ namespace DungeonCrawl
 			}
 		}
 
-		static void DrawTile(byte x, byte y, Map.Tile tile)
-		{
-			Console.SetCursorPosition(x, y);
-			switch (tile)
-			{
-				case Map.Tile.Floor:
-					Print(".", ConsoleColor.Gray); break;
-
-				case Map.Tile.Wall:
-					Print("#", ConsoleColor.DarkGray); break;
-
-				case Map.Tile.Door:
-					Print("+", ConsoleColor.Yellow); break;
-				case Map.Tile.Stairs:
-					Print(">", ConsoleColor.Yellow); break;
-
-				default: break;
-			}
-		}
-		static void DrawMapAll(Map level)
+		internal static void DrawMapAll(Map level)
 		{
 			for (byte y = 0; y < level.height; y++)
 			{
@@ -533,28 +480,12 @@ namespace DungeonCrawl
 				{
 					int ti = y * level.width + x;
 					Map.Tile tile = (Map.Tile)level.Tiles[ti];
-					DrawTile(x, y, tile);
+					Map.DrawTile(x, y, tile);
 				}
 			}
 		}
 
-		static void DrawMap(Map level, List<int> dirtyTiles)
-		{
-			if (dirtyTiles.Count == 0)
-			{
-				DrawMapAll(level);
-			}
-			else
-			{
-				foreach (int dt in dirtyTiles)
-				{
-					byte x = (byte)(dt % level.width);
-					byte y = (byte)(dt / level.width);
-					Map.Tile tile = (Map.Tile)level.Tiles[dt];
-					DrawTile(x, y, tile);
-				}
-			}
-		}
+		
 		static void DrawEnemies(List<Monster> enemies)
 		{
 			foreach (Monster m in enemies)
@@ -806,7 +737,7 @@ namespace DungeonCrawl
 			}
 
 			// Check movement
-			Map.Tile destination = GetTileAtMap(level, destinationPlace);
+			Map.Tile destination = Map.GetTileAtMap(level, destinationPlace);
 			if (destination == Map.Tile.Floor)
 			{
 				character.position = destinationPlace;
@@ -831,18 +762,7 @@ namespace DungeonCrawl
 			return PlayerTurnResult.TurnOver;
 		}
 
-		static Map.Tile GetTileAtMap(Map level, Vector2 position)
-		{
-			if (position.X >= 0 && position.X < level.width)
-			{
-				if (position.Y >= 0 && position.Y < level.height)
-				{
-					int ti = (int)position.Y * level.width + (int)position.X;
-					return (Map.Tile)level.Tiles[ti];
-				}
-			}
-			return Map.Tile.Wall;
-		}
+		
 
 		static int GetDistanceBetween(Vector2 A, Vector2 B)
 		{
@@ -891,7 +811,7 @@ namespace DungeonCrawl
 					}
 					else
 					{
-						Map.Tile destination = GetTileAtMap(level, destinationPlace);
+						Map.Tile destination = Map.GetTileAtMap(level, destinationPlace);
 						if (destination == Map.Tile.Floor)
 						{
 							enemy.position = destinationPlace;
