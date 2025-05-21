@@ -32,10 +32,10 @@ namespace DungeonCrawl
 
 	internal class Program
 	{
-		const int INFO_HEIGHT = 6;
-		const int COMMANDS_WIDTH = 12;
-		const int ENEMY_CHANCE = 3;
-		const int ITEM_CHANCE = 4;
+        internal const int INFO_HEIGHT = 6;
+		internal const int COMMANDS_WIDTH = 12;
+		internal const int ENEMY_CHANCE = 3;
+		internal const int ITEM_CHANCE = 4;
 
 		// Room generation 
 		const int ROOM_AMOUNT = 12;
@@ -68,7 +68,7 @@ namespace DungeonCrawl
 						Console.Clear();
 
 						// Map Creation 
-						currentLevel = CreateMap(random);
+						currentLevel = Map.CreateMap(random);
 
 						// Enemy init
 						monsters = CreateEnemies(currentLevel, random);
@@ -109,7 +109,7 @@ namespace DungeonCrawl
 							}
 							else if (result == PlayerTurnResult.NextLevel)
 							{
-								currentLevel = CreateMap(random);
+								currentLevel = Map.CreateMap(random);
 								monsters = CreateEnemies(currentLevel, random);
 								items = CreateItems(currentLevel, random);
 								PlacePlayerToMap(player, currentLevel);
@@ -373,7 +373,7 @@ namespace DungeonCrawl
 			}
 		}
 
-		static void AddRoom(Map level, int boxX, int boxY, int boxWidth, int boxHeight, Random random)
+		internal static void AddRoom(Map level, int boxX, int boxY, int boxWidth, int boxHeight, Random random)
 		{
 			int width = random.Next(ROOM_MIN_W, boxWidth);
 			int height = random.Next(ROOM_MIN_H, boxHeight);
@@ -402,80 +402,6 @@ namespace DungeonCrawl
 					}
 				}
 			}
-		}
-
-		static Map CreateMap(Random random)
-		{
-			Map level = new Map();
-
-			level.width = Console.WindowWidth - COMMANDS_WIDTH;
-			level.height = Console.WindowHeight - INFO_HEIGHT;
-			level.Tiles = new Map.Tile[level.width * level.height];
-
-			// Create perimeter wall
-			for (int y = 0; y < level.height; y++)
-			{
-				for (int x = 0; x < level.width; x++)
-				{
-					int ti = y * level.width + x;
-					if (y == 0 || x == 0 || y == level.height - 1 || x == level.width - 1)
-					{
-						level.Tiles[ti] = Map.Tile.Wall;
-					}
-					else
-					{
-						level.Tiles[ti] = Map.Tile.Floor;
-					}
-				}
-			}
-
-			int roomRows = 3;
-			int roomsPerRow = 6;
-			int boxWidth = (Console.WindowWidth - COMMANDS_WIDTH - 2) / roomsPerRow;
-			int boxHeight = (Console.WindowHeight - INFO_HEIGHT - 2) / roomRows;
-			for (int roomRow = 0; roomRow < roomRows; roomRow++)
-			{
-				for (int roomColumn = 0; roomColumn < roomsPerRow; roomColumn++)
-				{
-					AddRoom(level, roomColumn * boxWidth + 1, roomRow * boxHeight + 1, boxWidth, boxHeight, random);
-				}
-			}
-
-			// Add enemies and items
-			for (int y = 0; y < level.height; y++)
-			{
-				for (int x = 0; x < level.width; x++)
-				{
-					int ti = y * level.width + x;
-					if (level.Tiles[ti] == Map.Tile.Floor)
-					{
-						int chance = random.Next(100);
-						if (chance < ENEMY_CHANCE)
-						{
-							level.Tiles[ti] = Map.Tile.Monster;
-							continue;
-						}
-
-						chance = random.Next(100);
-						if (chance < ITEM_CHANCE)
-						{
-							level.Tiles[ti] = Map.Tile.Item;
-						}
-					}
-				}
-			}
-
-			// Find starting place for player
-			for (int i = 0; i < level.Tiles.Length; i++)
-			{
-				if (level.Tiles[i] == Map.Tile.Floor)
-				{
-					level.Tiles[i] = Map.Tile.Player;
-					break;
-				}
-			}
-
-			return level;
 		}
 
 		static Monster CreateMonster(string name, int hitpoints, char symbol, ConsoleColor color, Vector2 position)
