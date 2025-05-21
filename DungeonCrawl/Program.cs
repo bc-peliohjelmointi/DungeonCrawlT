@@ -10,6 +10,7 @@ namespace DungeonCrawl
 		GameLoop,
 		Inventory,
 		DeathScreen,
+		WinScreen,
 		Quit
 	}
 	enum PlayerTurnResult
@@ -62,7 +63,7 @@ namespace DungeonCrawl
 				{
 					case GameState.CharacterCreation:
 						// Character creation screen
-						player = CreateCharacter();
+						player = PlayerCharacter.CreateCharacter();
 						Console.CursorVisible = false;
 						Console.Clear();
 
@@ -124,6 +125,7 @@ namespace DungeonCrawl
 
 						DrawInfo(player, monsters, items, messages);
 
+						
 						// Is player dead?
 						if (player.hitpoints < 0)
 						{
@@ -177,7 +179,7 @@ namespace DungeonCrawl
 			Console.ForegroundColor = color;
 			Console.WriteLine(text);
 		}
-		static void Print(string text, ConsoleColor color)
+		internal static void Print(string text, ConsoleColor color)
 		{
 			Console.ForegroundColor = color;
 			Console.Write(text);
@@ -186,7 +188,7 @@ namespace DungeonCrawl
 		{
 			Console.WriteLine(text);
 		}
-		static void Print(string text)
+		internal static void Print(string text)
 		{
 			Console.Write(text);
 		}
@@ -197,7 +199,7 @@ namespace DungeonCrawl
 			Console.Write(symbol);
 		}
 
-		static void DrawBrickBg()
+		internal static void DrawBrickBg()
 		{
 			// Draw tiles
 			Console.BackgroundColor = ConsoleColor.DarkGray;
@@ -218,7 +220,7 @@ namespace DungeonCrawl
 			}
 		}
 
-		static void DrawRectangle(int x, int y, int width, int height, ConsoleColor color)
+		internal static void DrawRectangle(int x, int y, int width, int height, ConsoleColor color)
 		{
 			Console.BackgroundColor = color;
 			for (int dy = y; dy < y + height; dy++)
@@ -231,7 +233,7 @@ namespace DungeonCrawl
 			}
 		}
 
-		static void DrawRectangleBorders(int x, int y, int width, int height, ConsoleColor color, string symbol)
+		internal static void DrawRectangleBorders(int x, int y, int width, int height, ConsoleColor color, string symbol)
 		{
 			Console.SetCursorPosition(x, y);
 			Console.ForegroundColor = color;
@@ -279,43 +281,7 @@ namespace DungeonCrawl
 		/*
 		 * Character functions
 		 */
-		static PlayerCharacter CreateCharacter()
-		{
-			PlayerCharacter character = new PlayerCharacter();
-			character.name = "";
-			character.hitpoints = 20;
-			character.maxHitpoints = character.hitpoints;
-			character.gold = 0;
-			character.weapon = null;
-			character.armor = null;
-			character.inventory = new List<Item>();
-
-			Console.Clear();
-			DrawBrickBg();
-
-			// Draw entrance
-			Console.BackgroundColor = ConsoleColor.Black;
-			int doorHeight = (int)(Console.WindowHeight * (3.0f / 4.0f));
-			int doorY = Console.WindowHeight - doorHeight;
-			int doorWidth = (int)(Console.WindowWidth * (3.0f / 5.0f));
-			int doorX = Console.WindowWidth / 2 - doorWidth / 2;
-
-			DrawRectangle(doorX, doorY, doorWidth, doorHeight, ConsoleColor.Black);
-			DrawRectangleBorders(doorX + 1, doorY + 1, doorWidth - 2, doorHeight - 2, ConsoleColor.Blue, "|");
-			DrawRectangleBorders(doorX + 3, doorY + 3, doorWidth - 6, doorHeight - 6, ConsoleColor.DarkBlue, "|");
-
-			Console.SetCursorPosition(Console.WindowWidth / 2 - 8, Console.WindowHeight / 2);
-			Print("Welcome Brave Adventurer!");
-			Console.SetCursorPosition(Console.WindowWidth / 2 - 8, Console.WindowHeight / 2 + 1);
-			Print("What is your name?", ConsoleColor.Yellow);
-			while (string.IsNullOrEmpty(character.name))
-			{
-				character.name = Console.ReadLine();
-			}
-			Print($"Welcome {character.name}!", ConsoleColor.Yellow);
-
-			return character;
-		}
+		
 
 		static void GiveItem(PlayerCharacter character, Item item)
 		{
@@ -352,6 +318,10 @@ namespace DungeonCrawl
 				case ItemType.Treasure:
 					character.gold += item.quality;
 					break;
+			}
+			if (character.gold == 10)
+			{
+				
 			}
 
 		}
@@ -510,13 +480,8 @@ namespace DungeonCrawl
 
 		static Monster CreateMonster(string name, int hitpoints, char symbol, ConsoleColor color, Vector2 position)
 		{
-			Monster monster = new Monster();
-			monster.name = name;
-			monster.hitpoints = hitpoints;
-			monster.symbol = symbol;
-			monster.color = color;
-			monster.position = position;
-			return monster;
+			
+			return new Monster(name, hitpoints, symbol, color, position);
 		}
 
 		static Monster CreateRandomMonster(Random random, Vector2 position)

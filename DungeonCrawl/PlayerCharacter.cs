@@ -12,5 +12,43 @@ namespace DungeonCrawl
 		public int gold;
 		public Vector2 position;
 		public List<Item> inventory;
-	}
+
+        internal static PlayerCharacter CreateCharacter()
+        {
+            PlayerCharacter character = new PlayerCharacter();
+            character.name = "";
+            character.hitpoints = 20;
+            character.maxHitpoints = character.hitpoints;
+            character.gold = 0;
+            character.weapon = null;
+            character.armor = null;
+            character.inventory = new List<Item>();
+
+            Console.Clear();
+            Program.DrawBrickBg();
+
+            // Draw entrance
+            Console.BackgroundColor = ConsoleColor.Black;
+            int doorHeight = (int)(Console.WindowHeight * (3.0f / 4.0f));
+            int doorY = Console.WindowHeight - doorHeight;
+            int doorWidth = (int)(Console.WindowWidth * (3.0f / 5.0f));
+            int doorX = Console.WindowWidth / 2 - doorWidth / 2;
+
+            Program.DrawRectangle(doorX, doorY, doorWidth, doorHeight, ConsoleColor.Black);
+            Program.DrawRectangleBorders(doorX + 1, doorY + 1, doorWidth - 2, doorHeight - 2, ConsoleColor.Blue, "|");
+            Program.DrawRectangleBorders(doorX + 3, doorY + 3, doorWidth - 6, doorHeight - 6, ConsoleColor.DarkBlue, "|");
+
+            Console.SetCursorPosition(Console.WindowWidth / 2 - 8, Console.WindowHeight / 2);
+            Program.Print("Welcome Brave Adventurer!");
+            Console.SetCursorPosition(Console.WindowWidth / 2 - 8, Console.WindowHeight / 2 + 1);
+            Program.Print("What is your name?", ConsoleColor.Yellow);
+            while (string.IsNullOrEmpty(character.name))
+            {
+                character.name = Console.ReadLine();
+            }
+            Program.Print($"Welcome {character.name}!", ConsoleColor.Yellow);
+
+            return character;
+        }
+    }
 }
