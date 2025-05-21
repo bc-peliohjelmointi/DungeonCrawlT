@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace DungeonCrawl
 {
-    public class Monster
+    internal class Monster
     {
         public string name;
         public Vector2 position;

@@ -529,12 +529,8 @@ namespace DungeonCrawl
 
 		static Item CreateItem(string name, ItemType type, int quality, Vector2 position)
 		{
-			Item i = new Item();
-			i.name = name;
-			i.type = type;
-			i.quality = quality;
-			i.position = position;
-			return i;
+			
+			return new Item(name, type, quality, position);
 		}
 		static List<Item> CreateItems(Map level, Random random)
 		{
