@@ -51,7 +51,7 @@ namespace DungeonCrawl
             {
                 for (int roomColumn = 0; roomColumn < roomsPerRow; roomColumn++)
                 {
-                    Program.AddRoom(level, roomColumn * boxWidth + 1, roomRow * boxHeight + 1, boxWidth, boxHeight, random);
+                    Map.AddRoom(level, roomColumn * boxWidth + 1, roomRow * boxHeight + 1, boxWidth, boxHeight, random);
                 }
             }
 
@@ -110,19 +110,19 @@ namespace DungeonCrawl
                 default: break;
             }
         }
-        internal static void DrawMap(Map level, List<int> dirtyTiles)
+        internal void DrawMap(List<int> dirtyTiles)
         {
             if (dirtyTiles.Count == 0)
             {
-                Program.DrawMapAll(level);
+                Program.DrawMapAll(this);
             }
             else
             {
                 foreach (int dt in dirtyTiles)
                 {
-                    byte x = (byte)(dt % level.width);
-                    byte y = (byte)(dt / level.width);
-                    Tile tile = level.Tiles[dt];
+                    byte x = (byte)(dt % width);
+                    byte y = (byte)(dt / width);
+                    Tile tile = Tiles[dt];
                     DrawTile(x, y, tile);
                 }
             }
@@ -139,5 +139,36 @@ namespace DungeonCrawl
             }
             return Tile.Wall;
         }
+        internal static void AddRoom(Map level, int boxX, int boxY, int boxWidth, int boxHeight, Random random)
+        {
+            int width = random.Next(Program.ROOM_MIN_W, boxWidth);
+            int height = random.Next(Program.ROOM_MIN_H, boxHeight);
+            int sx = boxX + random.Next(0, boxWidth - width);
+            int sy = boxY + random.Next(0, boxHeight - height);
+            int doorX = random.Next(1, width - 1);
+            int doorY = random.Next(1, height - 1);
+
+            // Create perimeter wall
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int ti = (sy + y) * level.width + (sx + x);
+                    if (y == 0 || x == 0 || y == height - 1 || x == width - 1)
+                    {
+
+                        if (y == doorY || x == doorX)
+                        {
+                            level.Tiles[ti] = Tile.Door;
+                        }
+                        else
+                        {
+                            level.Tiles[ti] = Tile.Wall;
+                        }
+                    }
+                }
+            }
+        }
     }
+
 }

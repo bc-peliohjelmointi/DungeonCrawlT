@@ -50,5 +50,66 @@ namespace DungeonCrawl
 
             return character;
         }
+        internal static void GiveItem(PlayerCharacter character, Item item)
+        {
+            // Inventory order
+            // Weapons
+            // Armors
+            // Potions
+            switch (item.type)
+            {
+                case ItemType.Weapon:
+                    if ((character.weapon != null && character.weapon.quality < item.quality)
+                        || character.weapon == null)
+                    {
+                        character.weapon = item;
+                    }
+                    character.inventory.Insert(0, item);
+                    break;
+                case ItemType.Armor:
+                    if ((character.armor != null && character.armor.quality < item.quality)
+                        || character.armor == null)
+                    {
+                        character.armor = item;
+                    }
+                    int armorIndex = 0;
+                    while (armorIndex < character.inventory.Count && character.inventory[armorIndex].type == ItemType.Weapon)
+                    {
+                        armorIndex++;
+                    }
+                    character.inventory.Insert(armorIndex, item);
+                    break;
+                case ItemType.Potion:
+                    character.inventory.Add(item);
+                    break;
+                case ItemType.Treasure:
+                    character.gold += item.quality;
+                    break;
+            }
+
+
+        }
+        internal static int GetCharacterDamage(PlayerCharacter character)
+        {
+            if (character.weapon != null)
+            {
+                return character.weapon.quality;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        internal static int GetCharacterDefense(PlayerCharacter character)
+        {
+            if (character.armor != null)
+            {
+                return character.armor.quality;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }
